@@ -1,0 +1,191 @@
+/* --- CSS Variables --- */
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --dark-text: #343a40;
+    --light-text: #f8f9fa;
+    --background-light: #f8f9fa;
+    --white-color: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --font-stack: 'Montserrat', sans-serif;
+}
+
+/* --- Basic Reset & Body Styles --- */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-stack);
+    background-color: var(--white-color);
+    color: var(--dark-text);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* --- Header & Navigation --- */
+.site-header {
+    background-color: var(--white-color);
+    box-shadow: 0 2px 4px var(--shadow-color);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo a {
+    text-decoration: none;
+    color: var(--dark-text);
+}
+
+.logo h2 {
+    margin: 0;
+    font-weight: 700;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--dark-text);
+    font-size: 16px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-links a:hover, .nav-links a.active {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+
+/* --- Hero Section --- */
+.hero-section {
+    background-color: var(--background-light);
+    padding: 80px 0;
+    text-align: center;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--secondary-color);
+    margin-bottom: 40px;
+}
+
+.hero-buttons .btn {
+    margin: 0 10px;
+    padding: 15px 30px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* --- How It Works Section --- */
+.how-it-works-section {
+    padding: 80px 0;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 60px;
+}
+
+.step-card {
+    background-color: var(--white-color);
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    transition: transform 0.3s, box-shadow 0.3s;
+    height: 100%;
+}
+
+.step-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.step-number {
+    width: 60px;
+    height: 60px;
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.step-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.step-description {
+    color: var(--secondary-color);
+}
+
+/* --- Footer --- */
+.site-footer-bottom {
+    background-color: var(--dark-text);
+    color: var(--light-text);
+    padding: 20px 0;
+    text-align: center;
+}
+
+.site-footer-bottom p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .row > * {
+        margin-bottom: 30px;
+    }
+}
+.footer { background: #212529; color: #fff; padding: 50px 0 20px; }
+        .footer h5 { font-weight: 600; margin-bottom: 15px; }
+        .footer p, .footer a { font-size: 0.95rem; color: #ccc; }
+        .footer a:hover { text-decoration: underline; }
+        .footer hr { border-color: rgba(255,255,255,0.2); }

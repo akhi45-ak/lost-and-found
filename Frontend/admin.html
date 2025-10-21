@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lost & Found - Admin Panel</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+:root {
+  --primary: #4f46e5;
+  --danger: #ef4444;
+  --light-bg: #f9fafb;
+  --border: #e5e7eb;
+  --card-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Segoe UI", Roboto, sans-serif; background: var(--light-bg); color: #111827; }
+.layout { display: flex; height: 100vh; transition: all 0.3s; }
+.sidebar { width: 260px; background: #fff; border-right: 1px solid var(--border); display: flex; flex-direction: column; box-shadow: 2px 0 12px rgba(0,0,0,0.08); transition: width 0.3s; }
+.sidebar h2 { padding: 25px 20px; margin: 0; font-size: 22px; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+.sidebar h2 i { font-size: 28px; }
+.nav-btn { display: flex; align-items: center; gap: 15px; padding: 15px 20px; border: none; background: none; cursor: pointer; font-size: 15px; color: #374151; transition: all 0.3s ease; border-left: 4px solid transparent; }
+.nav-btn i { width: 25px; text-align: center; font-size: 16px; }
+.nav-btn:hover { background: #eef2ff; color: var(--primary); border-left: 4px solid var(--primary); }
+.nav-btn.active { background: #eef2ff; color: var(--primary); font-weight: 600; border-left: 4px solid var(--primary); }
+.logout { margin-top: auto; background: var(--danger); color: #fff; font-weight: bold; border-radius: 0 20px 20px 0; }
+.logout:hover { background: #dc2626; }
+.main { flex: 1; padding: 30px; overflow-y: auto; transition: all 0.3s; }
+h1, h2 { margin-bottom: 25px; font-weight: 700; color: #111827; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+.card { background: var(--card-gradient); color: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; display: flex; flex-direction: column; justify-content: space-between; }
+.card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+.card h2 { font-size: 14px; color: rgba(255,255,255,0.8); margin: 0 0 10px; display: flex; align-items: center; gap: 5px; }
+.card p { font-size: 28px; font-weight: bold; margin: 0; }
+table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); display: block; overflow-x: auto; white-space: nowrap; }
+th, td { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 14px; text-align: left; }
+th { background: #f3f4f6; font-size: 12px; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.5px; }
+tbody tr:nth-child(even) { background: #f9fafb; }
+tbody tr:hover { background: #eef2ff; }
+.status { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-align: center; }
+.available { background: #dcfce7; color: #166534; }
+.claimed { background: #fee2e2; color: #991b1b; }
+.btn { background: none; border: none; cursor: pointer; font-size: 13px; font-weight: 600; margin-right: 8px; transition: color 0.2s; }
+.btn.claim { color: #10b981; }
+.btn.claim:hover { color: #059669; }
+.btn.delete { color: var(--danger); }
+.btn.delete:hover { color: #b91c1c; }
+img { border-radius: 8px; }
+@media(max-width:768px){ .sidebar{ width: 60px; } .sidebar h2{ display:none; } .nav-btn span{ display:none; } .main{ padding:20px; } }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <div class="sidebar">
+    <h2><i class="fa-solid fa-boxes-packing"></i> Lost & Found</h2>
+    <button class="nav-btn active" data-view="dashboard"><i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span></button>
+    <button class="nav-btn" data-view="found"><i class="fa-solid fa-box"></i> <span>Found Items</span></button>
+    <button class="nav-btn" data-view="lost"><i class="fa-solid fa-magnifying-glass"></i> <span>Lost Items</span></button>
+    <button class="nav-btn" data-view="users"><i class="fa-solid fa-users"></i> <span>Users</span></button>
+    <button class="nav-btn" data-view="claimed"><i class="fa-solid fa-circle-check"></i> <span>Claimed Items</span></button>
+    <button id="logoutBtn" class="nav-btn logout"><i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span></button>
+  </div>
+
+  <div class="main">
+    <section id="dashboard">
+      <h1>Dashboard</h1>
+      <div class="stats">
+        <div class="card"><h2><i class="fa-solid fa-magnifying-glass"></i> Lost Items</h2><p id="stat-lost">0</p></div>
+        <div class="card"><h2><i class="fa-solid fa-box"></i> Found Items</h2><p id="stat-found">0</p></div>
+        <div class="card"><h2><i class="fa-solid fa-check-circle"></i> Claimed</h2><p id="stat-claimed">0</p></div>
+        <div class="card"><h2><i class="fa-solid fa-users"></i> Total Users</h2><p id="stat-users">0</p></div>
+      </div>
+    </section>
+
+    <section id="found" class="hidden">
+      <h2>Manage Found Items</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th><th>Category</th><th>Description</th><th>Date Found</th>
+            <th>Location</th><th>Contact</th><th>Photo</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="foundTable"></tbody>
+      </table>
+    </section>
+
+    <section id="lost" class="hidden">
+      <h2>Manage Lost Items</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th><th>Category</th><th>Description</th><th>Date Lost</th>
+            <th>Location</th><th>Contact</th><th>Photo</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="lostTable"></tbody>
+      </table>
+    </section>
+
+    <section id="users" class="hidden">
+      <h1>Manage Users</h1>
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Last Login</th></tr></thead>
+        <tbody id="usersTable"></tbody>
+      </table>
+    </section>
+
+    <section id="claimed" class="hidden">
+      <h1>Claimed Items</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th><th>Category</th><th>Description</th><th>Type</th>
+            <th>Claimed By</th><th>Claimed Date</th><th>Contact</th><th>Photo</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="claimedTable"></tbody>
+      </table>
+    </section>
+
+  </div>
+</div>
+
+<script>
+if(localStorage.getItem("isAdmin") !== "true"){
+  alert("Unauthorized! Redirecting to login...");
+  window.location.href = "login.html";
+}
+
+const escapeHtml = str => str ? String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;') : "";
+
+async function fetchData(url,fallback={}) {
+  try {
+    const res = await fetch(url);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch(err){
+    console.error(`Failed to fetch ${url}:`, err);
+    return fallback;
+  }
+}
+
+// Render tables
+function renderItems(tableId,items,type){
+  const table = document.getElementById(tableId);
+  table.innerHTML = items.map(item => `
+    <tr>
+      <td>${escapeHtml(item.Item_Name || item.itemName)}</td>
+      <td>${escapeHtml(item.category || "-")}</td>
+      <td>${escapeHtml(item.Description || "-")}</td>
+      <td>${type==="lost" ? new Date(item.Date_lost).toLocaleDateString() : new Date(item.Date_found).toLocaleDateString()}</td>
+      <td>${escapeHtml(item["Location_"+type] || "-")}</td>
+      <td>${escapeHtml(item.contactNo || "-")}</td>
+      <td>${item.upload_photo ? `<img src="http://localhost:5000${item.upload_photo}" width="80">` : "No Photo"}</td>
+      <td><span class="status ${item.status==="Claimed"?"claimed":"available"}">${item.status}</span></td>
+      <td>
+        ${item.status==="Available"?`<button class="btn claim" data-id="${item._id}" data-type="${type}"><i class="fa-solid fa-check"></i> Claim</button>`:""}
+        <button class="btn delete" data-id="${item._id}" data-type="${type}"><i class="fa-solid fa-trash"></i> Delete</button>
+      </td>
+    </tr>
+  `).join("");
+}
+
+// Load counts for dashboard
+async function loadDashboard() {
+  const [lostData, foundData, claimedData, usersData] = await Promise.all([
+    fetchData("http://localhost:5000/admin/lostitems",{items:[]}),
+    fetchData("http://localhost:5000/admin/founditems",{items:[]}),
+    fetchData("http://localhost:5000/admin/claimeditems",{items:[]}),
+    fetchData("http://localhost:5000/admin/users",{users:[]})
+  ]);
+
+  document.getElementById("stat-lost").textContent = lostData.items.length;
+  document.getElementById("stat-found").textContent = foundData.items.length;
+  document.getElementById("stat-claimed").textContent = claimedData.items.length;
+  document.getElementById("stat-users").textContent = usersData.users.length;
+
+  renderItems("lostTable", lostData.items, "lost");
+  renderItems("foundTable", foundData.items, "found");
+
+  document.getElementById("usersTable").innerHTML = usersData.users.map(u=>`
+    <tr>
+      <td>${escapeHtml(u.fullName)}</td>
+      <td>${escapeHtml(u.email)}</td>
+      <td>${escapeHtml(u.role)}</td>
+      <td>${u.lastLogin ? new Date(u.lastLogin).toLocaleString() : "-"}</td>
+    </tr>
+  `).join("");
+
+  document.getElementById("claimedTable").innerHTML = claimedData.items.map(item => `
+    <tr>
+      <td>${escapeHtml(item.itemName)}</td>
+      <td>${escapeHtml(item.category || "-")}</td>
+      <td>${escapeHtml(item.Description || "-")}</td>
+      <td>${escapeHtml(item.itemType)}</td>
+      <td>${escapeHtml(item.claimedBy || "-")}</td>
+      <td>${item.claimDate ? new Date(item.claimDate).toLocaleString() : "-"}</td>
+      <td>${escapeHtml(item.contactNo || "-")}</td>
+      <td>${item.upload_photo ? `<img src="http://localhost:5000${item.upload_photo}" width="80">` : "No Photo"}</td>
+      <td><span class="status claimed">${item.status}</span></td>
+    </tr>
+  `).join("");
+}
+
+// Navigation buttons
+document.querySelectorAll(".nav-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    document.querySelectorAll("section").forEach(sec=>sec.classList.add("hidden"));
+    document.getElementById(btn.dataset.view).classList.remove("hidden");
+  });
+});
+
+// Logout
+document.getElementById("logoutBtn").addEventListener("click",()=>{
+  localStorage.removeItem("isAdmin");
+  window.location.href="login.html";
+});
+
+// Initial load
+loadDashboard();
+</script>
+</body>
+</html>

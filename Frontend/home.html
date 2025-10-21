@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lost & Found Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="home.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { display: none; } /* Hide until login check passes */
+    </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <a href="./home.html"><h2>QISCET ReclaimHub</h2></a>
+                </div>
+                <ul class="nav-links">
+                    <!-- Navbar links will be added dynamically -->
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div id="login-greeting" class="text-center mt-3" style="font-weight:bold; color:green;"></div>
+        <section class="hero-section">
+            <div class="container text-center">
+                <h1 class="hero-title">Welcome to QISCET ReclaimHub</h1>
+                <p class="hero-subtitle">
+                    Helping students and staff reconnect with their lost belongings on campus.
+                </p>
+                <p class="hero-description">
+                    Lost your ID, notes, or a personal item? Found something that doesn’t belong to you? 
+                    ReclaimHub is here to make reporting, tracking, and returning items easy, safe, and fast.
+                </p>
+                <div class="hero-buttons mt-4">
+                    <a href="./lost.html" class="btn btn-primary btn-lg">I Lost Something</a>
+                    <a href="./found.html" class="btn btn-secondary btn-lg">I Found Something</a>
+                </div>
+            </div>
+        </section>
+
+
+
+        <section class="how-it-works-section">
+            <div class="container">
+                <h2 class="section-title text-center">How It Works</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="step-card text-center">
+                            <div class="step-number">1</div>
+                            <h3 class="step-title">Report Your Item</h3>
+                            <p class="step-description">
+                                Lost something or found an unclaimed item? Fill in the details and upload a photo so it’s easy to identify.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="step-card text-center">
+                            <div class="step-number">2</div>
+                            <h3 class="step-title">We Help You Find a Match</h3>
+                            <p class="step-description">
+                                Our system checks for possible matches between lost and found items, making sure nothing slips through the cracks.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="step-card text-center">
+                            <div class="step-number">3</div>
+                            <h3 class="step-title">Get Notified & Reunite</h3>
+                            <p class="step-description">
+                                When a match is found, you’ll get a notification so you can contact the owner or finder and get the item back safely.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <!-- About Section -->
+                <div class="col-md-4 mb-3">
+                    <h5>About QISCET ReclaimHub</h5>
+                    <p>
+                        QISCET ReclaimHub helps students and staff report, track, and return lost items on campus. 
+                        A safe and easy way to reconnect belongings with their owners.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="col-md-4 mb-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="./home.html" class="text-white text-decoration-none">Home</a></li>
+                        <li><a href="./lost.html" class="text-white text-decoration-none">Lost Items</a></li>
+                        <li><a href="./found.html" class="text-white text-decoration-none">Found Items</a></li>
+                        <li><a href="./contact.html" class="text-white text-decoration-none">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="col-md-4 mb-3">
+                    <h5>Contact Us</h5>
+                    <p>Email: support@qiscet.edu.in</p>
+                    <p>Phone: +91 12345 67890</p>
+                    <p>Address: QIS College of Engineering & Technology, Ongole, Andhra Pradesh</p>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="text-center">
+                <p class="mb-0">&copy; 2025 QISCET ReclaimHub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- Scripts -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const navLinks = document.querySelector('.nav-links');
+            const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+
+            if (!isLoggedIn) {
+                // Redirect to register page if not logged in
+                window.location.href = "./register.html";
+                return;
+            }
+            
+
+            // If logged in, build navbar
+            navLinks.innerHTML = `
+                <li><a href="./home.html" class="active">Home</a></li>
+                <li><a href="./lost.html">Lost Items</a></li>
+                <li><a href="./found.html">Found Items</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            `;
+
+            // Logout logic
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                localStorage.removeItem('loggedIn');
+                localStorage.removeItem('userEmail');
+                window.location.href = './login.html';
+            });
+
+            // Show page after check passes
+            document.body.style.display = "block";
+        
+        });
+
+        if(localStorage.getItem("loggedIn")!=="true"){
+                window.location.href="login.html";
+        }  
+
+        const loginMessage = document.getElementById('login-greeting');
+        const username = localStorage.getItem('userEmail'); // or store username if you have it
+
+        if (username) {
+            loginMessage.textContent = `Welcome to our webpage, ${username}!`;
+        } else {
+            loginMessage.textContent = 'Welcome!';
+        }
+
+          
+    </script>
+    <script src="navbar.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>

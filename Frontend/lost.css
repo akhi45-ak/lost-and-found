@@ -1,0 +1,141 @@
+/* --- CSS Variables --- */
+:root {
+    --primary-color: #0d6efd;
+    --dark-text: #343a40;
+    --light-text: #f8f9fa;
+    --border-color: #dee2e6;
+    --background-light: #f8f9fa;
+    --white-color: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --font-stack: 'Montserrat', sans-serif;
+}
+
+/* --- Basic Reset & Body Styles --- */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-stack);
+    background-color: var(--background-light);
+    color: var(--dark-text);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* --- Header & Navigation --- */
+.site-header {
+    background-color: var(--white-color);
+    box-shadow: 0 2px 4px var(--shadow-color);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo a {
+    text-decoration: none;
+    color: var(--dark-text);
+}
+
+.logo h2 {
+    margin: 0;
+    font-weight: 700;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--dark-text);
+    font-size: 16px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-links a:hover, .nav-links a.active {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+
+/* --- Main Content & Form --- */
+.main-content {
+    padding: 60px 0;
+}
+
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: var(--white-color);
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px var(--shadow-color);
+}
+
+.form-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.form-subtitle {
+    text-align: center;
+    color: #6c757d;
+    margin-bottom: 40px;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+.form-control, .form-select {
+    padding: 12px;
+}
+
+.btn-primary {
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-top: 20px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Footer --- */
+.site-footer-bottom {
+    background-color: var(--dark-text);
+    color: var(--light-text);
+    padding: 20px 0;
+    text-align: center;
+    margin-top: 60px;
+}
+
+.site-footer-bottom p {
+    margin: 0;
+    font-size: 0.9rem;
+}
