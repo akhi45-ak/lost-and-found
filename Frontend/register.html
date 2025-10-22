@@ -99,7 +99,7 @@
     }
 
     try {
-      const res = await fetch('http://localhost:5000/register', {
+      const res = await fetch('https://lost-and-found-udyt.onrender.com/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fullName, email, password })
