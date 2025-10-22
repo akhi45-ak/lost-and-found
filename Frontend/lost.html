@@ -356,7 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const formData = new FormData(form);
 
     try {
-      const response = await fetch("http://localhost:5000/lost/add", {
+      const response = await fetch("https://lost-and-found-udyt.onrender.com/lost/add", {
         method: "POST",
         body: formData
       });
@@ -373,7 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadItems() {
     try {
-      const response = await fetch("http://localhost:5000/lost");
+      const response = await fetch("https://lost-and-found-udyt.onrender.com/lost");
       const data = await response.json();
       allItems = data.items || [];
       renderItems(allItems);
@@ -393,7 +393,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="col-lg-3 col-md-4 col-sm-6">
         <div class="card item-card">
           ${item.upload_photo 
-            ? `<img src="http://localhost:5000${item.upload_photo}" class="item-image" alt="${item.Item_Name}">` 
+            ? `<img src="https://lost-and-found-udyt.onrender.com${item.upload_photo}" class="item-image" alt="${item.Item_Name}">` 
             : '<div class="item-image-placeholder"><span>Item Image</span></div>'
           }
           <div class="card-body">
@@ -439,7 +439,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        const res = await fetch(`http://localhost:5000/lost/claim/${selectedItem._id}`, {
+        const res = await fetch(`https://lost-and-found-udyt.onrender.com/lost/claim/${selectedItem._id}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ claimerName, claimerEmail })
@@ -473,7 +473,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modalBody.innerHTML = `
       <div class="text-center mb-3">
         ${item.upload_photo
-          ? `<img src="http://localhost:5000${item.upload_photo}" class="img-fluid rounded mb-3" style="max-height: 250px;">`
+          ? `<img src="https://lost-and-found-udyt.onrender.com${item.upload_photo}" class="img-fluid rounded mb-3" style="max-height: 250px;">`
           : `<div class="item-image-placeholder"><span>No Image</span></div>`
         }
       </div>
