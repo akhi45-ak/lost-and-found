@@ -264,7 +264,7 @@
       e.preventDefault();
       const formData = new FormData(form);
       try {
-        const res = await fetch("http://localhost:5000/found/add", { method: "POST", body: formData });
+        const res = await fetch("https://lost-and-found-udyt.onrender.com/found/add", { method: "POST", body: formData });
         const data = await res.json();
         alert(data.message);
         form.reset();
@@ -278,7 +278,7 @@
 
     async function loadItems() {
       try {
-        const res = await fetch("http://localhost:5000/found");
+        const res = await fetch("https://lost-and-found-udyt.onrender.com/found");
         const data = await res.json();
         allItems = data.items || [];
         renderItems(allItems);
@@ -295,7 +295,7 @@
       itemsGrid.innerHTML = items.map(item => `
         <div class="col-lg-3 col-md-4 col-sm-6">
           <div class="card item-card">
-            ${item.upload_photo ? `<img src="http://localhost:5000${item.upload_photo}" class="item-image">`
+            ${item.upload_photo ? `<img src="https://lost-and-found-udyt.onrender.com${item.upload_photo}" class="item-image">`
             : `<div class='item-image-placeholder'>No Image</div>`}
             <div class="card-body">
               <h5>${item.Item_Name}</h5>
@@ -328,7 +328,7 @@
       const modalEl = document.getElementById("foundItemDetailsModal");
       const modalBody = modalEl.querySelector(".modal-body");
       modalBody.innerHTML = `
-        ${item.upload_photo ? `<img src="http://localhost:5000${item.upload_photo}" class="img-fluid mb-3 rounded">` : ""}
+        ${item.upload_photo ? `<img src="https://lost-and-found-udyt.onrender.com${item.upload_photo}" class="img-fluid mb-3 rounded">` : ""}
         <h5>${item.Item_Name}</h5>
         <p><b>Category:</b> ${item.category}</p>
         <p><b>Description:</b> ${item.Description}</p>
@@ -347,7 +347,7 @@
       if (!claimerName || !claimerEmail) return alert("Both fields required.");
 
       try {
-        const res = await fetch(`http://localhost:5000/found/claim/${item._id}`, {
+        const res = await fetch(`https://lost-and-found-udyt.onrender.com/found/claim/${item._id}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ claimerName, claimerEmail })
