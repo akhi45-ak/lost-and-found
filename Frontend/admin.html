@@ -45,7 +45,7 @@ tbody tr:hover { background: #eef2ff; }
 .btn.claim:hover { color: #059669; }
 .btn.delete { color: var(--danger); }
 .btn.delete:hover { color: #b91c1c; }
-img { border-radius: 8px; }
+img { border-radius: 8px; max-width: 100px; max-height: 80px; }
 @media(max-width:768px){ .sidebar{ width: 60px; } .sidebar h2{ display:none; } .nav-btn span{ display:none; } .main{ padding:20px; } }
 .hidden { display: none; }
 </style>
@@ -54,7 +54,7 @@ img { border-radius: 8px; }
 
 <div class="layout">
   <div class="sidebar">
-    <h2><i class="fa-solid fa-boxes-packing"></i> Lost & Found</h2>
+    <h2><i class="fa-solid fa-boxes-packing"></i> QISCET ReclaimHub</h2>
     <button class="nav-btn active" data-view="dashboard"><i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span></button>
     <button class="nav-btn" data-view="found"><i class="fa-solid fa-box"></i> <span>Found Items</span></button>
     <button class="nav-btn" data-view="lost"><i class="fa-solid fa-magnifying-glass"></i> <span>Lost Items</span></button>
@@ -120,18 +120,20 @@ img { border-radius: 8px; }
         <tbody id="claimedTable"></tbody>
       </table>
     </section>
-
   </div>
 </div>
 
 <script>
+// Simple admin check
 if(localStorage.getItem("isAdmin") !== "true"){
   alert("Unauthorized! Redirecting to login...");
   window.location.href = "login.html";
 }
 
+// Escape HTML to prevent XSS
 const escapeHtml = str => str ? String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;') : "";
 
+// Fetch data with fallback
 async function fetchData(url,fallback={}) {
   try {
     const res = await fetch(url);
@@ -143,7 +145,7 @@ async function fetchData(url,fallback={}) {
   }
 }
 
-// Render tables
+// Render items in table
 function renderItems(tableId,items,type){
   const table = document.getElementById(tableId);
   table.innerHTML = items.map(item => `
@@ -164,7 +166,7 @@ function renderItems(tableId,items,type){
   `).join("");
 }
 
-// Load counts for dashboard
+// Load dashboard stats and tables
 async function loadDashboard() {
   const [lostData, foundData, claimedData, usersData] = await Promise.all([
     fetchData("http://localhost:5000/admin/lostitems",{items:[]}),
@@ -205,7 +207,7 @@ async function loadDashboard() {
   `).join("");
 }
 
-// Navigation buttons
+// Navigation
 document.querySelectorAll(".nav-btn").forEach(btn=>{
   btn.addEventListener("click",()=>{
     document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
@@ -219,6 +221,54 @@ document.querySelectorAll(".nav-btn").forEach(btn=>{
 document.getElementById("logoutBtn").addEventListener("click",()=>{
   localStorage.removeItem("isAdmin");
   window.location.href="login.html";
+});
+
+// Handle claim/delete buttons
+document.querySelector(".main").addEventListener("click", async (e) => {
+  const btn = e.target.closest("button.btn"); 
+  if (!btn) return;
+  const id = btn.dataset.id;
+  const type = btn.dataset.type;
+
+  if (btn.classList.contains("delete")) {
+    if (!confirm("Are you sure you want to delete this item?")) return;
+    try {
+      const res = await fetch(`http://localhost:5000/admin/${type}/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        alert("Item deleted successfully.");
+        loadDashboard();
+      } else {
+        alert("Error: " + data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete item.");
+    }
+  }
+
+  if (btn.classList.contains("claim")) {
+    const claimerName = prompt("Enter claimer's Full Name:", "Admin Claim");
+    const claimerEmail = prompt("Enter claimer's Email:", "admin@qiscet.com");
+    if (!claimerName || !claimerEmail) return alert("Claimer name and email are required.");
+    try {
+      const res = await fetch(`http://localhost:5000/${type}/claim/${id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ claimerName, claimerEmail })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("Item marked as claimed.");
+        loadDashboard();
+      } else {
+        alert("Error: " + data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to claim item.");
+    }
+  }
 });
 
 // Initial load

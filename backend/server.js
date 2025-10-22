@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
-const nodemailer = require('nodemailer');
 
 const app = express();
 
@@ -27,77 +26,6 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
 });
 const upload = multer({ storage });
-
-// ===== Nodemailer Setup =====
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'your-email@gmail.com',      // replace with your Gmail
-    pass: 'your-app-password'          // Gmail App Password
-  }
-});
-
-transporter.verify(function(error, success) {
-  if (error) console.error('❌ Email transporter error:', error);
-  else console.log('✅ Email transporter ready');
-});
-
-// ===== Email Template Function =====
-async function sendEmail(to, subject, item) {
-  try {
-    const htmlContent = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <style>
-        body { font-family: Arial, sans-serif; background-color: #f3f4f6; margin:0; padding:0; }
-        .container { max-width:600px; margin:20px auto; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.08);}
-        .header { background-color: #4f46e5; color: white; padding:20px; text-align:center;}
-        .header h1 { margin:0; font-size:24px;}
-        .content { padding:20px; color:#333; }
-        .content h2 { color:#111827; margin-top:0; }
-        .item-image { width:100%; max-width:300px; border-radius:8px; margin:15px 0; }
-        .details p { margin:5px 0; }
-        .button { display:inline-block; padding:12px 20px; background-color:#4f46e5; color:white; text-decoration:none; border-radius:8px; margin-top:15px; font-weight:bold;}
-        .footer { font-size:12px; color:#888; text-align:center; padding:15px;}
-        @media only screen and (max-width:600px) { .container { width:95%; } .button { width:100%; text-align:center; } }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header"><h1>QISCET ReclaimHub</h1></div>
-        <div class="content">
-          <p>Hello,</p>
-          <p>A new <strong>${item.itemType}</strong> item has been posted!</p>
-          <h2>${item.Item_Name}</h2>
-          <p>${item.Description}</p>
-          ${item.upload_photo ? `<img src="http://localhost:5000${item.upload_photo}" alt="Item Image" class="item-image">` : ''}
-          <div class="details">
-            <p><strong>Location:</strong> ${item.Location_lost || item.Location_found || 'N/A'}</p>
-            <p><strong>Date:</strong> ${item.Date_lost || item.Date_found || 'N/A'}</p>
-          </div>
-          <a href="http://localhost:3000/${item.itemType.toLowerCase()}.html" class="button">View Item</a>
-        </div>
-        <div class="footer">You are receiving this email because you are registered on QISCET ReclaimHub.</div>
-      </div>
-    </body>
-    </html>
-    `;
-
-    await transporter.sendMail({
-      from: '"QISCET ReclaimHub" <your-email@gmail.com>',
-      to,
-      subject,
-      html: htmlContent
-    });
-
-    console.log(`📧 Email sent to ${to}`);
-  } catch (err) {
-    console.error(`❌ Failed to send email to ${to}`, err);
-  }
-}
 
 // ===== Schemas =====
 const userSchema = new mongoose.Schema({
@@ -198,11 +126,12 @@ async function createDefaultAdmin() {
       password: "admin123",
       role: "admin"
     });
+    console.log("✅ Default admin created: admin@qiscet.com / admin123");
   }
 }
 createDefaultAdmin();
 
-// ===== Lost Items =====
+// ===== Lost Items (User) =====
 app.post('/lost/add', upload.single('itemPhoto'), async (req, res) => {
   const { Item_Name, category, Description, Date_lost, Location_lost, reportedBy, contactNo, email } = req.body;
   try {
@@ -218,19 +147,22 @@ app.post('/lost/add', upload.single('itemPhoto'), async (req, res) => {
       upload_photo: req.file ? `/uploads/${req.file.filename}` : null
     });
     await newLost.save();
-
-    // Send notifications to all users
-    const users = await User.find({}, 'email');
-    const itemData = { ...newLost.toObject(), itemType: "Lost" };
-    await Promise.all(users.map(user => sendEmail(user.email, `New Lost Item: ${Item_Name}`, itemData)));
-
-    res.json({ success: true, message: "Lost item added and notifications sent!" });
+    res.json({ success: true, message: "Lost item added successfully!" });
   } catch (err) {
     res.status(500).json({ message: "Server error", err });
   }
 });
 
-// ===== Found Items =====
+app.get('/lost', async (req, res) => {
+  try {
+    const items = await Lost.find({}).sort({ createdAt: -1 });
+    res.json({ success: true, items: items || [] });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", items: [] });
+  }
+});
+
+// ===== Found Items (User) =====
 app.post('/found/add', upload.single('upload_photo'), async (req, res) => {
   const { Item_Name, category, Description, Date_found, Location_found, reportedBy, contactNo, email } = req.body;
   try {
@@ -246,19 +178,22 @@ app.post('/found/add', upload.single('upload_photo'), async (req, res) => {
       upload_photo: req.file ? `/uploads/${req.file.filename}` : null
     });
     await newFound.save();
-
-    // Send notifications to all users
-    const users = await User.find({}, 'email');
-    const itemData = { ...newFound.toObject(), itemType: "Found" };
-    await Promise.all(users.map(user => sendEmail(user.email, `New Found Item: ${Item_Name}`, itemData)));
-
-    res.json({ success: true, message: "Found item added and notifications sent!" });
+    res.json({ success: true, message: "Found item added successfully!" });
   } catch (err) {
     res.status(500).json({ message: "Server error", err });
   }
 });
 
-// ===== Claims =====
+app.get('/found', async (req, res) => {
+  try {
+    const items = await Found.find({}).sort({ createdAt: -1 });
+    res.json({ success: true, items: items || [] });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", items: [] });
+  }
+});
+
+// ===== Claims (User/Admin) =====
 app.post("/lost/claim/:id", async (req, res) => {
   const { claimerName, claimerEmail } = req.body;
   try {
@@ -310,6 +245,64 @@ app.post("/found/claim/:id", async (req, res) => {
     await claim.save();
     await Found.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: "Found item claimed successfully!" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", err });
+  }
+});
+
+// ===== Admin Routes =====
+app.get('/admin/lostitems', async (req, res) => {
+  try {
+    const items = await Lost.find({}).sort({ createdAt: -1 });
+    res.json({ success: true, items: items || [] });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", items: [] });
+  }
+});
+
+app.get('/admin/founditems', async (req, res) => {
+  try {
+    const items = await Found.find({}).sort({ createdAt: -1 });
+    res.json({ success: true, items: items || [] });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", items: [] });
+  }
+});
+
+app.get('/admin/claimeditems', async (req, res) => {
+  try {
+    const items = await ClaimedItem.find({}).sort({ claimDate: -1 });
+    res.json({ success: true, items: items || [] });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", items: [] });
+  }
+});
+
+app.get('/admin/users', async (req, res) => {
+  try {
+    const users = await User.find({}, '-password').sort({ lastLogin: -1 });
+    res.json({ success: true, users: users || [] });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", users: [] });
+  }
+});
+
+// DELETE Lost / Found items
+app.delete('/admin/lost/:id', async (req, res) => {
+  try {
+    const item = await Lost.findByIdAndDelete(req.params.id);
+    if (!item) return res.status(404).json({ message: "Item not found" });
+    res.json({ success: true, message: "Lost item deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", err });
+  }
+});
+
+app.delete('/admin/found/:id', async (req, res) => {
+  try {
+    const item = await Found.findByIdAndDelete(req.params.id);
+    if (!item) return res.status(404).json({ message: "Item not found" });
+    res.json({ success: true, message: "Found item deleted" });
   } catch (err) {
     res.status(500).json({ message: "Server error", err });
   }
