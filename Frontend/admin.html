@@ -156,7 +156,7 @@ function renderItems(tableId,items,type){
       <td>${type==="lost" ? new Date(item.Date_lost).toLocaleDateString() : new Date(item.Date_found).toLocaleDateString()}</td>
       <td>${escapeHtml(item["Location_"+type] || "-")}</td>
       <td>${escapeHtml(item.contactNo || "-")}</td>
-      <td>${item.upload_photo ? `<img src="http://localhost:5000${item.upload_photo}" width="80">` : "No Photo"}</td>
+      <td>${item.upload_photo ? `<img src="https://lost-and-found-udyt.onrender.com${item.upload_photo}" width="80">` : "No Photo"}</td>
       <td><span class="status ${item.status==="Claimed"?"claimed":"available"}">${item.status}</span></td>
       <td>
         ${item.status==="Available"?`<button class="btn claim" data-id="${item._id}" data-type="${type}"><i class="fa-solid fa-check"></i> Claim</button>`:""}
@@ -169,10 +169,10 @@ function renderItems(tableId,items,type){
 // Load dashboard stats and tables
 async function loadDashboard() {
   const [lostData, foundData, claimedData, usersData] = await Promise.all([
-    fetchData("http://localhost:5000/admin/lostitems",{items:[]}),
-    fetchData("http://localhost:5000/admin/founditems",{items:[]}),
-    fetchData("http://localhost:5000/admin/claimeditems",{items:[]}),
-    fetchData("http://localhost:5000/admin/users",{users:[]})
+    fetchData("https://lost-and-found-udyt.onrender.com/admin/lostitems",{items:[]}),
+    fetchData("https://lost-and-found-udyt.onrender.com/admin/founditems",{items:[]}),
+    fetchData("https://lost-and-found-udyt.onrender.com/admin/claimeditems",{items:[]}),
+    fetchData("https://lost-and-found-udyt.onrender.com/admin/users",{users:[]})
   ]);
 
   document.getElementById("stat-lost").textContent = lostData.items.length;
@@ -201,7 +201,7 @@ async function loadDashboard() {
       <td>${escapeHtml(item.claimedBy || "-")}</td>
       <td>${item.claimDate ? new Date(item.claimDate).toLocaleString() : "-"}</td>
       <td>${escapeHtml(item.contactNo || "-")}</td>
-      <td>${item.upload_photo ? `<img src="http://localhost:5000${item.upload_photo}" width="80">` : "No Photo"}</td>
+      <td>${item.upload_photo ? `<img src="https://lost-and-found-udyt.onrender.com${item.upload_photo}" width="80">` : "No Photo"}</td>
       <td><span class="status claimed">${item.status}</span></td>
     </tr>
   `).join("");
@@ -233,7 +233,7 @@ document.querySelector(".main").addEventListener("click", async (e) => {
   if (btn.classList.contains("delete")) {
     if (!confirm("Are you sure you want to delete this item?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/admin/${type}/${id}`, { method: "DELETE" });
+      const res = await fetch(`https://lost-and-found-udyt.onrender.com/admin/${type}/${id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
         alert("Item deleted successfully.");
@@ -252,7 +252,7 @@ document.querySelector(".main").addEventListener("click", async (e) => {
     const claimerEmail = prompt("Enter claimer's Email:", "admin@qiscet.com");
     if (!claimerName || !claimerEmail) return alert("Claimer name and email are required.");
     try {
-      const res = await fetch(`http://localhost:5000/${type}/claim/${id}`, {
+      const res = await fetch(`https://lost-and-found-udyt.onrender.com/${type}/claim/${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ claimerName, claimerEmail })
